@@ -35,11 +35,11 @@ const userSchema = new mongoose.Schema({
 
 userSchema.methods.generateAuthToken = async function(){
    try{
-     // console.log(this._id)
+     
       const token = jwt.sign({_id:this._id.toString()}, "qwertyuiopasdfghjklzxcvbnmqwerty");
       this.tokens = this.tokens.concat({token:token})
       await this.save();
-     // console.log(token);
+    
       return token;
    }catch(error){
       res.send("error"+error);
@@ -49,9 +49,9 @@ userSchema.methods.generateAuthToken = async function(){
 
 userSchema.pre("save", async function(next){
    if(this.isModified("pass")){
-     // console.log(`current password is ${this.pass}`);
+     
       this.pass =await bcrypt.hash(this.pass, 10);
-    //  console.log(`ths current password id ${this.password}`);
+  
    }
    next();
 })
