@@ -1,0 +1,169 @@
+{{>navbar}}
+
+    <div class="container">
+        <h1>My Task</h1>
+            <div class="row">
+                
+                  <div class="col-auto">
+                    <label for="taskname" class="visually-hidden">Add Task</label>
+                    <input type="text" class="form-control" id="taskname" placeholder="Enter task name" name="task">
+                  </div>
+                  <div class="col-auto">
+                    <button id="addButton" type="submit" class="btn btn-success mb-3"  onclick="process()">Add</button>
+                    <button id="updateButton" type="submit" class="btn btn-primary mb-3"  onclick="updateTask()" style="display:none">Update </button>
+                 
+                  </div>
+            </div>
+            <table class="table table-striped">
+            <thead>
+                <tr>
+                <th scope="col">#</th>
+                <th scope="col">Task Name</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody id="field2">
+               
+            </tbody>
+        </table>
+        </div>
+    <br>
+    
+        
+
+
+<script>
+var taskcounter=0
+var __taskid=""
+    function deleteTask(taskId){
+
+        Element.prototype.remove = function() {
+            this.parentElement.removeChild(this);
+        }
+        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+            for(var i = this.length - 1; i >= 0; i--) {
+                if(this[i] && this[i].parentElement) {
+                    this[i].parentElement.removeChild(this[i]);
+                }
+            }
+        }
+       
+
+        document.getElementById(taskId).remove();
+       
+        
+        var xhr = new XMLHttpRequest();
+        const jsonString = { taskId: String(taskId) }
+        xhr.open("POST", "http://localhost:3000/delete-task", true);
+        xhr.setRequestHeader("Content-type", "application/json");
+
+        xhr.onload= function(){
+            document.getElementById("field2").innerHTML="";
+            taskcounter=0
+            __taskid=""
+            getTasks();
+        }
+        xhr.send(JSON.stringify(jsonString));
+
+
+    }
+
+    function process(){
+        var Task = document.getElementById("taskname").value;
+        var Addtask= document.getElementById("field2");
+        
+        var node = document.createElement("tr");
+        var taskId = new Date().getTime();
+        node.id = taskId;
+        node.innerHTML = `<th id="${taskId+"_counter"}" scope="row">${++taskcounter}</th><td id="${taskId+"_task"}">${Task}</td><td><i class="bi bi-pencil-fill" onclick="setInputBoxValue(${taskId})"></i></td><td><i class="bi bi-trash-fill" onclick="deleteTask(${taskId})"></i></td>`
+                
+        Addtask.append(node)
+        var xhr = new XMLHttpRequest();
+       
+        const jsonString = {task:Task, taskId: taskId, userId: window.localStorage.getItem('user')}
+        xhr.open("POST", "http://localhost:3000/insert", true);
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(JSON.stringify(jsonString));
+        
+        console.log(JSON.stringify(Addtask))
+
+        var input = document.getElementById("taskname");
+        input.value="";
+
+
+}
+    
+    function getTasks() {
+        const userId = window.localStorage.getItem('user');
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://localhost:3000/tasks/"+userId);
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send();
+        xhr.onload = function() {
+            console.log(xhr.response);
+            var tasks = JSON.parse(xhr.response);
+            var Addtask= document.getElementById("field2");
+
+            for(var i = 0; i < tasks.length; i++) {
+                var node = document.createElement("tr");
+                var Task= tasks[i].task
+                var taskId = tasks[i].taskId
+                node.id = taskId;
+                node.innerHTML = `<th id="${taskId+"_counter"}" scope="row">${++taskcounter}</th><td id="${taskId+"_task"}">${Task}</td><td><i class="bi bi-pencil-fill" onclick="setInputBoxValue(${taskId})"></i></td><td><i class="bi bi-trash-fill" onclick="deleteTask(${taskId})"></i></td>`
+                  Addtask.append(node)
+                };
+
+            }
+
+        xhr.onerror = function() { 
+               alert(`Network Error`);
+        };
+    }
+
+
+function updateTask(){
+    var Task = document.getElementById("taskname").value;
+    var taskId=__taskid;
+    var counter= document.getElementById(taskId+"_counter").innerText;
+    
+       var node = document.getElementById(taskId);
+     node.innerHTML = `<th id="${taskId+"_counter"}" scope="row">${counter}</th><td id=${taskId+"_task"}>${Task}</td><td><i class="bi bi-pencil-fill" onclick="setInputBoxValue(${taskId})"></i></td><td><i class="bi bi-trash-fill" onclick="deleteTask(${taskId})"></i></td>`
+                
+        
+        var xhr = new XMLHttpRequest();
+        
+        const jsonString = {taskname:Task}
+        xhr.open("PUT", "http://localhost:3000/update-task/"+taskId, true);
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(JSON.stringify(jsonString));
+        
+    var input = document.getElementById("taskname");
+    var addButton = document.getElementById("addButton");
+    var updateButton = document.getElementById("updateButton");
+    input.value="";
+    addButton.style.display="block";
+    updateButton.style.display="none";
+}
+
+function setInputBoxValue(taskId){
+    
+    var taskname = document.getElementById(taskId+"_task");
+    var addButton = document.getElementById("addButton");
+    var updateButton = document.getElementById("updateButton");
+    var input = document.getElementById("taskname");
+    __taskid=taskId;
+    addButton.style.display="none";
+    updateButton.style.display="block";
+    input.value=taskname.innerText;
+}
+
+
+    getTasks();
+    
+
+
+
+</script>  
+
+        

@@ -1,0 +1,143 @@
+{{>navbar}}
+<!DOCTYPE html> 
+<html> 
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<style> 
+<style> 
+Body {
+  font-family: Calibri, Helvetica, sans-serif;
+  background-color: white;
+}
+button { 
+      background-color: white; 
+       width: 20%;
+        color: balck; 
+        padding: 15px; 
+        margin: 5px 170px;
+        margin-left:330px; 
+        border: none; 
+        cursor: pointer; 
+        text-align: center;
+         } 
+
+ input[type=text], input[type=password] { 
+        width: 100%; 
+        margin: 8px 0;
+        padding: 12px 20px; 
+        display: inline-block; 
+        border: 2px solid green; 
+        box-sizing: border-box; 
+    }
+ button:hover { 
+        opacity: 0.7; 
+    } 
+ 
+      
+   
+ .container { 
+         width:800px;
+        margin-left:350px;
+        padding: 50px; 
+        background-color: white;
+        border: 1px solid;
+        border-color: green;
+        
+        }  
+</style> 
+<script>
+    function registerUser() {
+        document.getElementById('message').innerHTML = "";
+        let fname=document.getElementById('fname').value;
+        let lname=document.getElementById('lname').value;
+        let email=document.getElementById('email').value;
+        let phone=document.getElementById('phone').value;
+        let password=document.getElementById('pass').value;
+        let confirmPass=document.getElementById('confirmPass').value;
+        if(!(fname&&lname&&email&&phone&&password&&confirmPass))
+        {
+            document.getElementById('message').innerHTML = "Input missing"
+            return;
+        }
+        if(password != confirmPass)
+        {
+            document.getElementById('message').innerHTML = "Password does not match."
+            return;
+        }
+        $.ajax(
+        {   type: "POST",
+            url: "/user-register",
+            data: {fname:fname, lname:lname, email:email, phone:phone, pass:password},
+            success: function (data, status) {
+                console.log(data);
+                if(status === 400) {
+                    return document.getElementById('message').innerHTML = "Duplicate Entry";   
+                }
+                window.location = "/login"
+            },
+            dataType: "json"
+        });
+    }
+</script>
+</head> 
+<body>
+<h2>Registration Page</h2>
+
+
+<div class="container">
+    
+    <p id="message"></p>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label">First Name : </label> 
+        <div class="col-sm-10">
+            <input type="text" id="fname" class="form-control" placeholder="Enter First Name " name="firstname" required>
+        </div>
+    </div>
+
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label" >Last Name : </label> 
+        <div class="col-sm-10">
+            <input type="text" id="lname" class="form-control" placeholder="Enter Last Name " name="lastname" required>
+        </div>
+    </div>
+
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label">Email : </label> 
+        <div class="col-sm-10">
+            <input type="text" id="email"placeholder="Enter Email" name="email" required>
+
+        </div>
+    </div>
+    
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label">Phone : </label> 
+        <div class="col-sm-10">
+            <input type="text" id="phone" placeholder="Enter Phone Number" name="phone" required>
+    
+        </div>
+    </div>
+   
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label">Password : </label> 
+        <div class="col-sm-10">
+            <input type="password" id="pass" placeholder="Enter Password" name="pass" required>
+
+        </div>
+    </div>
+   
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label">Confirm Password : </label> 
+        <div class="col-sm-10">
+            <input type="password" id="confirmPass" placeholder="Enter Confirm Password" name="confirmPass" required>
+        </div>
+    </div>
+   
+    
+    <button type="submit" id="registerBtn" class="btn btn-outline-success"  onclick="registerUser()">Register</button>
+    </div>
+    {{!-- </form> --}}
+
+</body>
+</html>
