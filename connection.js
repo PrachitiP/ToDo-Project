@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const username = 'Prachiti'
-const passowrd = 'OiwSvVxwO%40MaRkVMm'
+const username = ''
+const passowrd = ''
 const server = 'cluster0.lunhk.mongodb.net'
 const dbname = 'User_data'
 
